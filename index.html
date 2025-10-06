@@ -20,7 +20,7 @@
     .ventana {
       display: none;
       padding: 20px;
-      max-width: 800px;
+      max-width: 900px;
       margin: auto;
     }
 
@@ -114,7 +114,21 @@
       background: #a4161a;
     }
 
-    /* Estilos para el modal */
+    /* Estilos para el buscador */
+    .buscador {
+      margin: 10px 0 20px;
+      text-align: center;
+    }
+    .buscador input {
+      width: 80%;
+      max-width: 400px;
+      padding: 10px;
+      border-radius: 10px;
+      border: 1px solid #aaa;
+      font-size: 16px;
+    }
+
+    /* Modal */
     .modal {
       display: none;
       position: fixed;
@@ -176,7 +190,7 @@
         <option value="Alto">Alto</option>
         <option value="Crítico">Crítico</option>
       </select>
-      <input type="text" id="imagen" placeholder="URL de la imagen">
+      <input type="file" id="imagen" accept="image/*">
       <button onclick="guardarAnimal()">Guardar en Pokédex</button>
     </div>
     <button class="volver" onclick="cambiarVentana('menu')">⬅ Volver</button>
@@ -185,6 +199,9 @@
   <!-- Ventana Ver Pokédex -->
   <div class="ventana" id="verPokedex">
     <h2>Lista de Animales</h2>
+    <div class="buscador">
+      <input type="text" id="buscador" placeholder="🔍 Buscar animal por nombre..." oninput="mostrarPokedex()">
+    </div>
     <div class="pokedex" id="pokedex"></div>
     <button class="volver" onclick="cambiarVentana('menu')">⬅ Volver</button>
   </div>
@@ -219,46 +236,56 @@
       const descripcion = document.getElementById("descripcion").value;
       const zona = document.getElementById("zona").value;
       const peligro = document.getElementById("peligro").value;
-      const imagen = document.getElementById("imagen").value;
+      const archivo = document.getElementById("imagen").files[0];
 
-      if (nombre.trim() === "" || descripcion.trim() === "" || zona.trim() === "" || imagen.trim() === "") {
+      if (!nombre.trim() || !descripcion.trim() || !zona.trim() || !archivo) {
         alert("Por favor completa todos los campos");
         return;
       }
 
-      const animal = { nombre, descripcion, zona, peligro, imagen };
+      const lector = new FileReader();
+      lector.onload = function(e) {
+        const imagenBase64 = e.target.result;
 
-      let animales = JSON.parse(localStorage.getItem("animales")) || [];
-      animales.push(animal);
-      localStorage.setItem("animales", JSON.stringify(animales));
+        const animal = { nombre, descripcion, zona, peligro, imagen: imagenBase64 };
 
-      alert("✅ Animal agregado a la Pokédex");
+        let animales = JSON.parse(localStorage.getItem("animales")) || [];
+        animales.push(animal);
+        localStorage.setItem("animales", JSON.stringify(animales));
 
-      document.getElementById("nombre").value = "";
-      document.getElementById("descripcion").value = "";
-      document.getElementById("zona").value = "";
-      document.getElementById("imagen").value = "";
+        alert("✅ Animal agregado a la Pokédex");
+
+        document.getElementById("nombre").value = "";
+        document.getElementById("descripcion").value = "";
+        document.getElementById("zona").value = "";
+        document.getElementById("imagen").value = "";
+      };
+
+      lector.readAsDataURL(archivo); // Convierte la imagen a Base64
     }
 
     function mostrarPokedex() {
       const contenedor = document.getElementById("pokedex");
+      const filtro = document.getElementById("buscador").value.toLowerCase();
       contenedor.innerHTML = "";
 
       let animales = JSON.parse(localStorage.getItem("animales")) || [];
 
-      if (animales.length === 0) {
-        contenedor.innerHTML = "<p>No hay animales en la Pokédex aún 🐾</p>";
+      let animalesFiltrados = animales.filter(a => a.nombre.toLowerCase().includes(filtro));
+
+      if (animalesFiltrados.length === 0) {
+        contenedor.innerHTML = "<p>No hay animales que coincidan con la búsqueda 🐾</p>";
         return;
       }
 
-      animales.forEach((a, index) => {
+      animalesFiltrados.forEach((a, index) => {
         const card = document.createElement("div");
         card.classList.add("card");
         card.innerHTML = `
           <img src="${a.imagen}" alt="${a.nombre}">
           <h3>${a.nombre}</h3>
         `;
-        card.onclick = () => abrirModal(index);
+        card.onclick = () => abrirModal(animales.indexOf(a)); 
         contenedor.appendChild(card);
       });
     }
