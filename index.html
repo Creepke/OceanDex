@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Pokédex de Animales</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1 {
+      text-align: center;
+      color: #e63946;
+      padding: 20px;
+    }
+
+    .ventana {
+      display: none;
+      padding: 20px;
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .activa {
+      display: block;
+    }
+
+    .menu button {
+      display: block;
+      margin: 15px auto;
+      padding: 15px 25px;
+      font-size: 18px;
+      border-radius: 10px;
+      border: none;
+      background: #457b9d;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .menu button:hover {
+      background: #1d3557;
+    }
+
+    .formulario input, .formulario textarea, .formulario select, .formulario button {
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .formulario button {
+      background: #457b9d;
+      color: white;
+      border: none;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .formulario button:hover {
+      background: #1d3557;
+    }
+
+    .pokedex {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 15px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
+      text-align: center;
+      transition: transform 0.2s;
+      cursor: pointer;
+    }
+
+    .card:hover {
+      transform: scale(1.05);
+    }
+
+    .card img {
+      max-width: 100%;
+      height: 180px;
+      object-fit: cover;
+      border-radius: 15px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      margin: 0;
+      color: #e63946;
+    }
+
+    .volver {
+      margin-top: 20px;
+      display: block;
+      background: #e63946;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+    }
+
+    .volver:hover {
+      background: #a4161a;
+    }
+
+    /* Estilos para el modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-contenido {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+    }
+    .modal-contenido h3 {
+      color: #e63946;
+    }
+    .modal button {
+      margin-top: 15px;
+    }
+    .eliminar {
+      background: #e63946;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .eliminar:hover {
+      background: #a4161a;
+    }
+  </style>
+</head>
+<body>
+  <h1>Pokédex de Animales</h1>
+
+  <!-- Ventana Menú -->
+  <div class="ventana activa" id="menu">
+    <div class="menu">
+      <button onclick="cambiarVentana('verPokedex')">📖 Ver Pokédex</button>
+      <button onclick="cambiarVentana('agregarAnimal')">➕ Agregar Animal</button>
+    </div>
+  </div>
+
+  <!-- Ventana Agregar -->
+  <div class="ventana" id="agregarAnimal">
+    <h2>Agregar un nuevo animal</h2>
+    <div class="formulario">
+      <input type="text" id="nombre" placeholder="Nombre del animal">
+      <textarea id="descripcion" rows="3" placeholder="Descripción"></textarea>
+      <input type="text" id="zona" placeholder="Zona en la que se encuentra">
+      <label for="peligro">Nivel de peligro de extinción:</label>
+      <select id="peligro">
+        <option value="Bajo">Bajo</option>
+        <option value="Medio">Medio</option>
+        <option value="Alto">Alto</option>
+        <option value="Crítico">Crítico</option>
+      </select>
+      <input type="text" id="imagen" placeholder="URL de la imagen">
+      <button onclick="guardarAnimal()">Guardar en Pokédex</button>
+    </div>
+    <button class="volver" onclick="cambiarVentana('menu')">⬅ Volver</button>
+  </div>
+
+  <!-- Ventana Ver Pokédex -->
+  <div class="ventana" id="verPokedex">
+    <h2>Lista de Animales</h2>
+    <div class="pokedex" id="pokedex"></div>
+    <button class="volver" onclick="cambiarVentana('menu')">⬅ Volver</button>
+  </div>
+
+  <!-- Modal -->
+  <div class="modal" id="modal">
+    <div class="modal-contenido" id="modalContenido">
+      <h3 id="modalNombre"></h3>
+      <img id="modalImagen" src="" alt="" style="width:100%;border-radius:10px;">
+      <p id="modalDescripcion"></p>
+      <p><strong>Zona:</strong> <span id="modalZona"></span></p>
+      <p><strong>Peligro:</strong> <span id="modalPeligro"></span></p>
+      <button class="eliminar" onclick="eliminarAnimal()">🗑 Eliminar</button>
+      <button class="volver" onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+
+  <script>
+    let indiceAnimalSeleccionado = null;
+
+    function cambiarVentana(idVentana) {
+      document.querySelectorAll('.ventana').forEach(v => v.classList.remove('activa'));
+      document.getElementById(idVentana).classList.add('activa');
+
+      if (idVentana === "verPokedex") {
+        mostrarPokedex();
+      }
+    }
+
+    function guardarAnimal() {
+      const nombre = document.getElementById("nombre").value;
+      const descripcion = document.getElementById("descripcion").value;
+      const zona = document.getElementById("zona").value;
+      const peligro = document.getElementById("peligro").value;
+      const imagen = document.getElementById("imagen").value;
+
+      if (nombre.trim() === "" || descripcion.trim() === "" || zona.trim() === "" || imagen.trim() === "") {
+        alert("Por favor completa todos los campos");
+        return;
+      }
+
+      const animal = { nombre, descripcion, zona, peligro, imagen };
+
+      let animales = JSON.parse(localStorage.getItem("animales")) || [];
+      animales.push(animal);
+      localStorage.setItem("animales", JSON.stringify(animales));
+
+      alert("✅ Animal agregado a la Pokédex");
+
+      document.getElementById("nombre").value = "";
+      document.getElementById("descripcion").value = "";
+      document.getElementById("zona").value = "";
+      document.getElementById("imagen").value = "";
+    }
+
+    function mostrarPokedex() {
+      const contenedor = document.getElementById("pokedex");
+      contenedor.innerHTML = "";
+
+      let animales = JSON.parse(localStorage.getItem("animales")) || [];
+
+      if (animales.length === 0) {
+        contenedor.innerHTML = "<p>No hay animales en la Pokédex aún 🐾</p>";
+        return;
+      }
+
+      animales.forEach((a, index) => {
+        const card = document.createElement("div");
+        card.classList.add("card");
+        card.innerHTML = `
+          <img src="${a.imagen}" alt="${a.nombre}">
+          <h3>${a.nombre}</h3>
+        `;
+        card.onclick = () => abrirModal(index);
+        contenedor.appendChild(card);
+      });
+    }
+
+    function abrirModal(index) {
+      let animales = JSON.parse(localStorage.getItem("animales")) || [];
+      const animal = animales[index];
+      indiceAnimalSeleccionado = index;
+
+      document.getElementById("modalNombre").textContent = animal.nombre;
+      document.getElementById("modalImagen").src = animal.imagen;
+      document.getElementById("modalDescripcion").textContent = animal.descripcion;
+      document.getElementById("modalZona").textContent = animal.zona;
+      document.getElementById("modalPeligro").textContent = animal.peligro;
+
+      document.getElementById("modal").style.display = "flex";
+    }
+
+    function cerrarModal() {
+      document.getElementById("modal").style.display = "none";
+      indiceAnimalSeleccionado = null;
+    }
+
+    function eliminarAnimal() {
+      if (indiceAnimalSeleccionado !== null) {
+        let animales = JSON.parse(localStorage.getItem("animales")) || [];
+        animales.splice(indiceAnimalSeleccionado, 1);
+        localStorage.setItem("animales", JSON.stringify(animales));
+        cerrarModal();
+        mostrarPokedex();
+      }
+    }
+  </script>
+</body>
+</html>
