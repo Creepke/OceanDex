@@ -10,159 +10,69 @@
       margin: 0;
       padding: 0;
     }
-
     h1 {
       text-align: center;
       color: #e63946;
       padding: 20px;
     }
-
-    .ventana {
-      display: none;
-      padding: 20px;
-      max-width: 900px;
-      margin: auto;
-    }
-
-    .activa {
-      display: block;
-    }
-
+    .ventana { display: none; padding: 20px; max-width: 900px; margin: auto; }
+    .activa { display: block; }
     .menu button {
-      display: block;
-      margin: 15px auto;
-      padding: 15px 25px;
-      font-size: 18px;
-      border-radius: 10px;
-      border: none;
-      background: #457b9d;
-      color: white;
-      cursor: pointer;
-      transition: 0.2s;
+      display: block; margin: 15px auto; padding: 15px 25px;
+      font-size: 18px; border-radius: 10px; border: none;
+      background: #457b9d; color: white; cursor: pointer; transition: 0.2s;
     }
-
-    .menu button:hover {
-      background: #1d3557;
-    }
-
+    .menu button:hover { background: #1d3557; }
     .formulario input, .formulario textarea, .formulario select, .formulario button {
-      width: 100%;
-      margin: 10px 0;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
+      width: 100%; margin: 10px 0; padding: 10px;
+      border-radius: 8px; border: 1px solid #ccc;
     }
-
     .formulario button {
-      background: #457b9d;
-      color: white;
-      border: none;
-      font-weight: bold;
-      cursor: pointer;
+      background: #457b9d; color: white; border: none; font-weight: bold; cursor: pointer;
     }
-
-    .formulario button:hover {
-      background: #1d3557;
-    }
-
+    .formulario button:hover { background: #1d3557; }
     .pokedex {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 20px;
-      margin-top: 20px;
+      gap: 20px; margin-top: 20px;
     }
-
     .card {
-      background: #ffffff;
-      border-radius: 20px;
-      padding: 15px;
-      box-shadow: 0 6px 12px rgba(0,0,0,0.2);
-      text-align: center;
-      transition: transform 0.2s;
-      cursor: pointer;
+      background: #ffffff; border-radius: 20px; padding: 15px;
+      box-shadow: 0 6px 12px rgba(0,0,0,0.2); text-align: center;
+      transition: transform 0.2s; cursor: pointer;
     }
-
-    .card:hover {
-      transform: scale(1.05);
-    }
-
+    .card:hover { transform: scale(1.05); }
     .card img {
-      max-width: 100%;
-      height: 180px;
-      object-fit: cover;
-      border-radius: 15px;
-      margin-bottom: 10px;
+      max-width: 100%; height: 180px; object-fit: cover;
+      border-radius: 15px; margin-bottom: 10px;
     }
-
-    .card h3 {
-      margin: 0;
-      color: #e63946;
-    }
-
+    .card h3 { margin: 0; color: #e63946; }
     .volver {
-      margin-top: 20px;
-      display: block;
-      background: #e63946;
-      color: white;
-      padding: 10px 20px;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
+      margin-top: 20px; display: block; background: #e63946;
+      color: white; padding: 10px 20px; border: none;
+      border-radius: 10px; cursor: pointer;
     }
-
-    .volver:hover {
-      background: #a4161a;
-    }
-
-    /* Estilos para el buscador */
-    .buscador {
-      margin: 10px 0 20px;
-      text-align: center;
-    }
+    .volver:hover { background: #a4161a; }
+    .buscador { margin: 10px 0 20px; text-align: center; }
     .buscador input {
-      width: 80%;
-      max-width: 400px;
-      padding: 10px;
-      border-radius: 10px;
-      border: 1px solid #aaa;
-      font-size: 16px;
+      width: 80%; max-width: 400px; padding: 10px;
+      border-radius: 10px; border: 1px solid #aaa; font-size: 16px;
     }
-
-    /* Modal */
     .modal {
-      display: none;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.6);
-      justify-content: center;
-      align-items: center;
+      display: none; position: fixed; top: 0; left: 0;
+      width: 100%; height: 100%; background: rgba(0,0,0,0.6);
+      justify-content: center; align-items: center;
     }
     .modal-contenido {
-      background: white;
-      padding: 20px;
-      border-radius: 15px;
-      max-width: 500px;
-      width: 90%;
-      text-align: center;
+      background: white; padding: 20px; border-radius: 15px;
+      max-width: 500px; width: 90%; text-align: center;
     }
-    .modal-contenido h3 {
-      color: #e63946;
-    }
-    .modal button {
-      margin-top: 15px;
-    }
+    .modal-contenido h3 { color: #e63946; }
     .eliminar {
-      background: #e63946;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 8px;
-      cursor: pointer;
+      background: #e63946; color: white; border: none;
+      padding: 10px 15px; border-radius: 8px; cursor: pointer;
     }
-    .eliminar:hover {
-      background: #a4161a;
-    }
+    .eliminar:hover { background: #a4161a; }
   </style>
 </head>
 <body>
@@ -222,13 +132,28 @@
   <script>
     let indiceAnimalSeleccionado = null;
 
+    window.onload = async function() {
+      // Si localStorage está vacío, carga desde el archivo JSON
+      let animales = JSON.parse(localStorage.getItem("animales")) || [];
+      if (animales.length === 0) {
+        await cargarAnimalesDesdeJSON();
+      }
+    };
+
+    async function cargarAnimalesDesdeJSON() {
+      try {
+        const respuesta = await fetch("animales.json");
+        const datos = await respuesta.json();
+        localStorage.setItem("animales", JSON.stringify(datos.animales));
+      } catch (error) {
+        console.error("Error al cargar el archivo JSON:", error);
+      }
+    }
+
     function cambiarVentana(idVentana) {
       document.querySelectorAll('.ventana').forEach(v => v.classList.remove('activa'));
       document.getElementById(idVentana).classList.add('activa');
-
-      if (idVentana === "verPokedex") {
-        mostrarPokedex();
-      }
+      if (idVentana === "verPokedex") mostrarPokedex();
     }
 
     function guardarAnimal() {
@@ -246,31 +171,24 @@
       const lector = new FileReader();
       lector.onload = function(e) {
         const imagenBase64 = e.target.result;
-
         const animal = { nombre, descripcion, zona, peligro, imagen: imagenBase64 };
-
         let animales = JSON.parse(localStorage.getItem("animales")) || [];
         animales.push(animal);
         localStorage.setItem("animales", JSON.stringify(animales));
-
         alert("✅ Animal agregado a la Pokédex");
-
         document.getElementById("nombre").value = "";
         document.getElementById("descripcion").value = "";
         document.getElementById("zona").value = "";
         document.getElementById("imagen").value = "";
       };
-
-      lector.readAsDataURL(archivo); // Convierte la imagen a Base64
+      lector.readAsDataURL(archivo);
     }
 
     function mostrarPokedex() {
       const contenedor = document.getElementById("pokedex");
       const filtro = document.getElementById("buscador").value.toLowerCase();
       contenedor.innerHTML = "";
-
       let animales = JSON.parse(localStorage.getItem("animales")) || [];
-
       let animalesFiltrados = animales.filter(a => a.nombre.toLowerCase().includes(filtro));
 
       if (animalesFiltrados.length === 0) {
@@ -281,11 +199,8 @@
       animalesFiltrados.forEach((a, index) => {
         const card = document.createElement("div");
         card.classList.add("card");
-        card.innerHTML = `
-          <img src="${a.imagen}" alt="${a.nombre}">
-          <h3>${a.nombre}</h3>
-        `;
-        card.onclick = () => abrirModal(animales.indexOf(a)); 
+        card.innerHTML = `<img src="${a.imagen}" alt="${a.nombre}"><h3>${a.nombre}</h3>`;
+        card.onclick = () => abrirModal(animales.indexOf(a));
         contenedor.appendChild(card);
       });
     }
@@ -294,13 +209,11 @@
       let animales = JSON.parse(localStorage.getItem("animales")) || [];
       const animal = animales[index];
       indiceAnimalSeleccionado = index;
-
       document.getElementById("modalNombre").textContent = animal.nombre;
       document.getElementById("modalImagen").src = animal.imagen;
       document.getElementById("modalDescripcion").textContent = animal.descripcion;
       document.getElementById("modalZona").textContent = animal.zona;
       document.getElementById("modalPeligro").textContent = animal.peligro;
-
       document.getElementById("modal").style.display = "flex";
     }
 
